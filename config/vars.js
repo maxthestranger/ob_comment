@@ -7,6 +7,9 @@ const vars = {
     username: process.env.U_NAME,
     password: process.env.P_WORD,
   },
+  jwtToken: {
+    accessTokenSec: process.env.ACCESS_TOKEN_SECRET,
+  },
 };
 
 module.exports = vars;

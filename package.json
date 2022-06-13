@@ -16,11 +16,15 @@
   },
   "homepage": "https://github.com/maxthestranger/ob_comment#readme",
   "dependencies": {
+    "bcrypt": "^5.0.1",
     "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "helmet": "^5.1.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.21",
     "morgan": "^1.10.0",
     "mysql2": "^2.3.3",
     "sequelize": "^6.20.1"

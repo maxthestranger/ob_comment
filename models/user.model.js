@@ -1,5 +1,5 @@
-const { DataTypes, Model } = require('sequelize');
-const sequalize = require('../config/mysql');
+const { DataTypes } = require('sequelize');
+const { sequalize } = require('../config/mysql');
 
 const User = sequalize.define('User', {
   username: {
