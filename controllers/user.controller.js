@@ -24,16 +24,42 @@ exports.getById = async (req, res) => {
 }
 
 exports.edit = (req, res) => {
-    const { userId, user } = req.body;
-    res.send({
-        userId,
-        user
-    })
+    const {avatarUrl} = req.body;
+
+    try{
+        User.update({
+            avatarUrl
+        }, {
+            where: {
+                id: req.params['userId']
+            }
+        }).then(data => {
+            res.send({
+                user: data,
+                message: 'User updated successfully'
+            })
+        })
+    }catch (e) {
+        console.log(e)
+    }
+
 }
 
 exports.remove = (req, res) => {
-    res.send({
-        message: 'deleted successfully'
-    })
+    const { userId } = req.params;
+    try{
+        User.destroy({
+            where: {
+                id: userId
+            }
+        }).then(data => {
+            res.send({
+                message: `${data} user deleted successfully`
+            })
+        })
+
+    }catch (e) {
+        console.log(e)
+    }
 }
 

@@ -4,7 +4,8 @@ const { sequalize } = require('../config/mysql');
 const User = sequalize.define('User', {
   id: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    primaryKey: true,
   },
   username: {
     type: DataTypes.STRING,
@@ -17,7 +18,14 @@ const User = sequalize.define('User', {
   avatarUrl: {
     type: DataTypes.STRING,
     allowNull: false,
-  },
+  }
+}, {
+  indexes: [
+    {
+      unique: true,
+      fields: ['username']
+    }
+  ]
 });
 
 module.exports = User;
