@@ -8,7 +8,7 @@ const verifyJWT = (req, res, next) => {
     const token = authHeaders.split(' ')[1]
     jwt.verify(
         token,
-        jwtToken,
+        jwtToken.accessTokenSec,
         (err, decoded) => {
             if(err) return res.sendStatus(403)
             req.user = decoded.username
