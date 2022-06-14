@@ -8,6 +8,7 @@ const router = require('../routes/index.route');
 const app = express();
 
 app.use(express.urlencoded({ extended: false }));
+app.use(express.json())
 
 // cors
 app.use(cors());

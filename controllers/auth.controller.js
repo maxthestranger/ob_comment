@@ -1,41 +1,46 @@
+const { v4: uuidv4 } = require('uuid');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const { trim, isEmpty, isNull } = require('lodash');
+const { trim, isEmpty, isNil, isNull } = require('lodash');
 const { jwtToken } = require('../config/vars');
 const User = require('../models/user.model');
 
 // if empty
-const ifEmpty = (value) => {
-  if (isEmpty(trim(value))) {
-    return true;
-  }
+const ifEmpty = (...args) => {
+  let res = false;
+  args.forEach(arg => {
+    if(isEmpty(trim(arg)) || isNil(trim(arg))){
+      res = true
+    }
+  })
 
-  return false;
+  return res
 };
 
 // hash password
-const hashedPassword = async (pass) => {
-  return await bcrypt.hash(pass, 10);
+const hashedPassword = (pass) => {
+  return bcrypt.hashSync(pass, 10);
 };
 
 exports.register = async (req, res) => {
   const { username, password, avatarUrl } = req.body;
 
   // check if empty
-  if (ifEmpty(username) && ifEmpty(password) && ifEmpty(avatarUrl)) {
+  if (ifEmpty(username, password, avatarUrl)) {
     res.status(422).send({
       message: 'Values cannot be empty',
     });
 
-    return;
+    return
   }
 
   // check duplicate username
   const [user, created] = await User.findOrCreate({
     where: { username },
-    default: {
-      password: hashedPassword(password),
-      avatarUrl,
+    defaults: {
+      id: uuidv4(),
+      password: await hashedPassword(password),
+      avatarUrl
     },
   });
 
@@ -48,7 +53,9 @@ exports.register = async (req, res) => {
     return;
   }
 
-  res.status(200).send(user);
+  res.status(200).send({
+    message: 'User created successfully'
+  });
 };
 
 exports.login = async (req, res) => {
@@ -69,7 +76,7 @@ exports.login = async (req, res) => {
 
   // check if password matches
   if (bcrypt.compareSync(password, user.password)) {
-    // generate accessToke
+    // generate accessToken
     const accessToken = jwt.sign(
       {
         username: user.username,
@@ -80,6 +87,18 @@ exports.login = async (req, res) => {
       }
     );
 
+    //generate refreshToken
+    const refreshToken = jwt.sign(
+        {
+          username: user.username,
+        },
+        jwtToken.accessTokenSec,
+        {
+          expiresIn: '1d',
+        }
+    );
+
+    res.cookie('jwt', refreshToken, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000})
     res.status(200).send({
       user,
       accessToken,
@@ -91,6 +110,4 @@ exports.login = async (req, res) => {
   res.status(403).send({
     message: 'Invalid password',
   });
-
-  return;
 };

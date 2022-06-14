@@ -2,6 +2,10 @@ const { DataTypes } = require('sequelize');
 const { sequalize } = require('../config/mysql');
 
 const User = sequalize.define('User', {
+  id: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   username: {
     type: DataTypes.STRING,
     allowNull: false,
