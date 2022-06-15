@@ -18,12 +18,15 @@ const User = sequalize.define('User', {
   avatarUrl: {
     type: DataTypes.STRING,
     allowNull: false,
+  },
+  refreshToken: {
+    type: DataTypes.STRING,
   }
 }, {
   indexes: [
     {
       unique: true,
-      fields: ['username']
+      fields: ['username', 'refreshToken']
     }
   ]
 });

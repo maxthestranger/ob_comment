@@ -9,6 +9,7 @@ const vars = {
   },
   jwtToken: {
     accessTokenSec: process.env.ACCESS_TOKEN_SECRET,
+    refreshTokenSec: process.env.REFRESH_TOKEN_SECRET
   },
 };
 

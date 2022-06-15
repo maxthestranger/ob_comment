@@ -92,13 +92,25 @@ exports.login = async (req, res) => {
         {
           username: user.username,
         },
-        jwtToken.accessTokenSec,
+        jwtToken.refreshTokenSec,
         {
           expiresIn: '1d',
         }
     );
 
-    res.cookie('jwt', refreshToken, {httpOnly: true, maxAge: 24 * 60 * 60 * 1000})
+    try{
+      User.update({
+        refreshToken
+      }, {
+        where: {
+          id: user.id
+        }
+      })
+    }catch (e) {
+      console.log(e)
+    }
+
+    res.cookie('jwt', refreshToken, {httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000})
     res.status(200).send({
       user,
       accessToken,
@@ -111,3 +123,76 @@ exports.login = async (req, res) => {
     message: 'Invalid password',
   });
 };
+
+exports.refreshToken = async (req, res) => {
+  const cookies = req.cookies;
+
+  if(!cookies?.jwt) return res.sendStatus(401);
+
+  const refreshToken = cookies.jwt;
+  const user = await User.findOne({
+    where: { refreshToken },
+  });
+
+  if (isNull(user)) {
+    res.status(404).send({
+      message: 'User not found',
+    });
+
+    return;
+  }
+
+  jwt.verify(
+      refreshToken,
+      jwtToken.refreshTokenSec,
+      (err, decoded) => {
+        console.log(err, user.username)
+        if(err || user.username !== decoded.username) return res.sendStatus(403)
+
+        const accessToken = jwt.sign(
+            {
+              "username": decoded.username
+            },
+            jwtToken.accessTokenSec,
+            {
+              expiresIn: '2m'
+            }
+        )
+
+        res.send({
+          accessToken
+        })
+      }
+  )
+}
+
+exports.logout = async (req, res) => {
+  const cookies = req.cookies;
+  if(!cookies?.jwt) return res.sendStatus(204);
+
+  const refreshToken = cookies.jwt;
+  const user = await User.findOne({
+    where: { refreshToken },
+  });
+
+  if (isNull(user)) {
+    res.clearCookie('jwt', {httpOnly: true, sameSite: 'None', secure: true})
+    res.sendStatus(204)
+    return;
+  }
+
+  try{
+    User.update({
+      refreshToken: ''
+    }, {
+      where: {
+        id: user.id
+      }
+    })
+  }catch (e) {
+    console.log(e)
+  }
+
+  res.clearCookie('jwt', {httpOnly: true, sameSite: 'None', secure: true})
+  res.sendStatus(204)
+}
