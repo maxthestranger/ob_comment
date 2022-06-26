@@ -1,11 +1,20 @@
 const Comment = require("../models/comment.model");
 const User = require("../models/user.model");
-exports.create = (req, res) => {
-    const { userId, detail } = req.body;
-    res.send({
-        userId,
-        detail
-    })
+
+exports.create = async (req, res) => {
+    const { userId, details } = req.body;
+    try{
+        const comment = await Comment.create({
+            details,
+            UserId: userId
+        });
+
+        res.send({
+            comment
+        })
+    }catch (e) {
+        console.log(e)
+    }
 }
 
 // list all comments
@@ -28,7 +37,14 @@ exports.getById = async (req, res) => {
     try{
         const comment = await Comment.findOne({ include: User, where: { id: commentId } })
         res.send({
-            comment
+            id: comment.id,
+            details: comment.details,
+            createdAt: comment.createdAt,
+            User: {
+                id: comment.User.id,
+                username: comment.User.username,
+                avatarUrl: comment.User.avatarUrl
+            }
         })
     }catch(e){
         console.log(e)

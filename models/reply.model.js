@@ -1,15 +1,18 @@
 const { DataTypes } = require('sequelize');
 const User = require('./user.model')
+const Comment = require('./comment.model')
 const { sequalize } = require('../config/mysql');
 
-const Comment = sequalize.define('Comment', {
+const Reply = sequalize.define('Reply', {
     details: {
         type: DataTypes.STRING,
         allowNull: false,
     }
 });
 
-User.hasMany(Comment)
-Comment.belongsTo(User)
+User.hasMany(Reply)
+Comment.hasMany(Reply)
+Reply.belongsTo(User)
+Reply.belongsTo(Comment)
 
-module.exports = Comment;
+module.exports = Reply;

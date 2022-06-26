@@ -2,6 +2,7 @@ const express = require('express');
 const authRoute = require('./auth.route');
 const userRoute = require('./user.route');
 const commentRoute = require('./comment.route');
+const replyRoute = require('./reply.route');
 const router = express.Router();
 
 router.get('/', (req, res) => {
@@ -13,5 +14,6 @@ router.get('/', (req, res) => {
 router.use('/auth', authRoute);
 router.use('/users', userRoute);
 router.use('/comments', commentRoute);
+router.use('/replies', replyRoute);
 
 module.exports = router;

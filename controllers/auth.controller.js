@@ -83,7 +83,7 @@ exports.login = async (req, res) => {
       },
       jwtToken.accessTokenSec,
       {
-        expiresIn: '2m',
+        expiresIn: '30m',
       }
     );
 
